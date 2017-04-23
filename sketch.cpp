@@ -164,31 +164,27 @@ void Diameter(){
         g.addEdge(a, b, w);
     }
 
-    int diameter = 0;
     int max = 0;
-    int flag = 0;
+    vector<pair<int, int> > pairs;
     for (int i = 0; i < n; i++){
-        g.distance.clear();
-        g.shortestPath(i);
-        for (int j = 0; j < n; j++){
-            if (g.distance[j] == -1){
-                cout << "INF" << endl;
-                flag = 1;
-                break;
-            }
-            else if (max < g.distance[j]){
-                max = g.distance[j];
-            }
-        }
-        if (diameter < max){
-            diameter = max;
-        }
-        if (flag == 1){
-            break;
+        for (int j = i+1; j < n; j++){
+            pairs.push_back(make_pair(i, j));
         }
     }
-    if (flag == 0)
-        cout << diameter << endl;
+
+    for (int i = 0; i < (int)pairs.size(); i++){
+        g.distance.clear();
+        g.shortestPath(pairs[i].first);
+
+        if (g.distance[pairs[i].second] == -1){
+            cout << "INF" << endl;
+            break;
+        }
+        else if (g.distance[pairs[i].second] > max){
+            max = g.distance[pairs[i].second];
+        }
+    }
+    cout << max << endl;
     return;
 }
 
