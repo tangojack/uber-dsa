@@ -23,7 +23,6 @@ class Graph{
         void shortestPath(int u);
 };
 
-
 void Graph::shortestPath(int u){
     vector<int> visited;
     priority_queue<pair<int, int> > pq; 
@@ -32,7 +31,7 @@ void Graph::shortestPath(int u){
             distance.push_back(0);
         }
         else{
-            distance.push_back(9999);
+            distance.push_back(-1);
         }   
     }
 
@@ -54,7 +53,7 @@ void Graph::shortestPath(int u){
             }
 
             if (flag == 0){
-                if (distance[v] > distance[u] + adjacency_list[u][j].second){
+                if (distance[v] > distance[u] + adjacency_list[u][j].second || distance[v] == -1){
                     distance[v] = distance[u] + adjacency_list[u][j].second;
                     pq.push(make_pair(distance[v], v));
                 }
@@ -67,6 +66,7 @@ void Graph::addEdge(int u, int v, int weight){
     adjacency_list[u].push_back(make_pair(v, weight));
     adjacency_list[v].push_back(make_pair(u, weight));
 }
+
 void NearestDriver(){
     int n, m;
 
@@ -91,11 +91,16 @@ void NearestDriver(){
     cin >> l;
 
     int car_loc;
-    int least = 9999;
+    int least;
+    int flag;
     for(int i = 0; i < l; i++){
         // scan over every car to get the final answer
+        flag = 0;
         cin >> car_loc;
-        if (least > g.distance[car_loc]){
+        if (g.distance[car_loc] == -1)
+            flag = 1;
+        
+        if (flag == 0 && least > g.distance[car_loc]){
             least = g.distance[car_loc];
             bestv = car_loc;
         }
@@ -109,15 +114,126 @@ void NearestDriver(){
 }
 
 void QueryPrice(){
-    //your code starts here
+    int n, m;
+
+    cin >> n >> m;
+    
+    Graph g(n); // implement Graph class by yourself
+    
+    for(int i = 0; i < m; i++){
+        int a, b, w;
+        cin >> a >> b >> w;
+
+        g.addEdge(a, b, w);
+    }
+
+    int queries;
+    cin >> queries;
+    vector<int> u, v;
+    int a, b;
+    // implement your own shortest path
+    for (int i = 0; i < queries; i++){
+        cin >> a >> b;
+        u.push_back(a);
+        v.push_back(b);
+    }
+    for (int i = 0; i < queries; i++){
+        g.distance.clear();
+        g.shortestPath(u[i]);
+        if (g.distance[v[i]] == -1){
+            cout << "NO" << endl;
+        }
+        else {
+            cout << g.distance[v[i]] << endl;
+        }
+    }
+    return;
 }
 
 void Diameter(){
-    //your code starts here
+    int n, m;
+
+    cin >> n >> m;
+    
+    Graph g(n); // implement Graph class by yourself
+    
+    for(int i = 0; i < m; i++){
+        int a, b, w;
+        cin >> a >> b >> w;
+
+        g.addEdge(a, b, w);
+    }
+
+    int diameter = 0;
+    int max = 0;
+    int flag = 0;
+    for (int i = 0; i < n; i++){
+        g.distance.clear();
+        g.shortestPath(i);
+        for (int j = 0; j < n; j++){
+            if (g.distance[j] == -1){
+                cout << "INF" << endl;
+                flag = 1;
+                break;
+            }
+            else if (max < g.distance[j]){
+                max = g.distance[j];
+            }
+        }
+        if (diameter < max){
+            diameter = max;
+        }
+        if (flag == 1){
+            break;
+        }
+    }
+    if (flag == 0)
+        cout << diameter << endl;
+    return;
 }
 
 void DiameterApproximation(){
-    //your code starts here
+    int n, m;
+
+    cin >> n >> m;
+    
+    Graph g(n); // implement Graph class by yourself
+    
+    for(int i = 0; i < m; i++){
+        int a, b, w;
+        cin >> a >> b >> w;
+
+        g.addEdge(a, b, w);
+    }
+
+    int diameter = 0;
+    int max = 0;
+    int flag = 0;
+    int index = 0;
+    for (int i = 0; i < 2; i++){
+        g.distance.clear();
+        g.shortestPath(index);
+        for (int j = 0; j < n; j++){
+            if (g.distance[j] == -1){
+                cout << "INF" << endl;
+                flag = 1;
+                break;
+            }
+            else if (max < g.distance[j]){
+                max = g.distance[j];
+                index = j;
+            }
+        }
+        if (diameter < max){
+            diameter = max;
+        }
+        if (flag == 1){
+            break;
+        }
+    }
+    if (flag == 0)
+        cout << diameter << endl;
+    return;
 }
 
 int main(){
