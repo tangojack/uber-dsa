@@ -39,7 +39,7 @@ void Graph::shortestPath(int u){
     int v;
     int flag;
 
-    while(visited.size() < adjacency_list.size()){
+    while(visited.size() < adjacency_list.size() && !pq.empty()){
         u = pq.top().second;
         pq.pop();
 
@@ -47,11 +47,6 @@ void Graph::shortestPath(int u){
         for (int j = 0; j < (int)adjacency_list[u].size(); j++){
             v = adjacency_list[u][j].first;
             flag = 0;
-            for (int i = 0; i < (int)visited.size(); i++){
-                if (v == visited[i])
-                    flag = 1;
-            }
-
             if (flag == 0){
                 if (distance[v] > distance[u] + adjacency_list[u][j].second || distance[v] == -1){
                     distance[v] = distance[u] + adjacency_list[u][j].second;
@@ -129,24 +124,37 @@ void QueryPrice(){
 
     int queries;
     cin >> queries;
-    vector<int> u, v;
+    
     int a, b;
+
+    int** d = new int*[n];
+    for (int i = 0; i < n; i++){
+        d[i] = new int[n]; 
+    }
+    
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j < n; j++){
+            d[i][j] = g.adjacency_list[i][j].second;
+        }
+    }
+    for (int k = 0; k < n; k++){
+        for (int i = 0; i < n; i++){
+            for (int j = 0; j < n; j++){
+                d[i][j] = d[i][j] > d[i][k]+d[k][j] ? d[i][k] + d[k][j] : d[i][j]; 
+            }
+        }
+    }
     // implement your own shortest path
     for (int i = 0; i < queries; i++){
         cin >> a >> b;
-        u.push_back(a);
-        v.push_back(b);
-    }
-    for (int i = 0; i < queries; i++){
-        g.distance.clear();
-        g.shortestPath(u[i]);
-        if (g.distance[v[i]] == -1){
+        if (d[a][b] == -1){
             cout << "NO" << endl;
         }
         else {
-            cout << g.distance[v[i]] << endl;
+            cout << d[a][b] << endl;
         }
     }
+
     return;
 }
 
