@@ -47,6 +47,7 @@ void Graph::shortestPath(int u){
         for (int j = 0; j < (int)adjacency_list[u].size(); j++){
             v = adjacency_list[u][j].first;
             flag = 0;
+
             if (flag == 0){
                 if (distance[v] > distance[u] + adjacency_list[u][j].second || distance[v] == -1){
                     distance[v] = distance[u] + adjacency_list[u][j].second;
@@ -113,48 +114,46 @@ void QueryPrice(){
 
     cin >> n >> m;
     
-    Graph g(n); // implement Graph class by yourself
+    Graph g(n); 
+    int** d = new int*[n];
+    for (int i = 0; i < n; i++){
+        d[i] = new int[n];
+        for (int j = 0; j < n; j++){
+            if (i == j)
+                d[i][j] = 0;
+            else
+                d[i][j] = 999999999;
+        }
+    }
     
     for(int i = 0; i < m; i++){
         int a, b, w;
         cin >> a >> b >> w;
-
-        g.addEdge(a, b, w);
+        d[a][b] = w;
+        d[b][a] = w;
     }
 
     int queries;
     cin >> queries;
-    
-    int a, b;
-
-    int** d = new int*[n];
-    for (int i = 0; i < n; i++){
-        d[i] = new int[n]; 
-    }
-    
-    for (int i = 0; i < n; i++){
-        for (int j = 0; j < n; j++){
-            d[i][j] = g.adjacency_list[i][j].second;
-        }
-    }
+   
     for (int k = 0; k < n; k++){
         for (int i = 0; i < n; i++){
             for (int j = 0; j < n; j++){
-                d[i][j] = d[i][j] > d[i][k]+d[k][j] ? d[i][k] + d[k][j] : d[i][j]; 
+                d[i][j] = d[i][j] > d[i][k] + d[k][j] ? d[i][k] + d[k][j] : d[i][j]; 
             }
         }
     }
-    // implement your own shortest path
+
+    int a, b;
     for (int i = 0; i < queries; i++){
         cin >> a >> b;
-        if (d[a][b] == -1){
+        if (d[a][b] == 999999999){
             cout << "NO" << endl;
         }
         else {
             cout << d[a][b] << endl;
         }
     }
-
     return;
 }
 
@@ -164,34 +163,46 @@ void Diameter(){
     cin >> n >> m;
     
     Graph g(n); // implement Graph class by yourself
-    
+    int** d = new int*[n];
+    for (int i = 0; i < n; i++){
+        d[i] = new int[n];
+        for (int j = 0; j < n; j++){
+            if (i == j)
+                d[i][j] = 0;
+            else
+                d[i][j] = 999999999;
+        }
+    }
+
     for(int i = 0; i < m; i++){
         int a, b, w;
         cin >> a >> b >> w;
+        d[a][b] = w;
+        d[b][a] = w;
+    }
 
-        g.addEdge(a, b, w);
+    for (int k = 0; k < n; k++){
+        for (int i = 0; i < n; i++){
+            for (int j = 0; j < n; j++){
+                d[i][j] = d[i][j] > d[i][k] + d[k][j] ? d[i][k] + d[k][j] : d[i][j]; 
+            }
+        }
     }
 
     int max = 0;
     vector<pair<int, int> > pairs;
     for (int i = 0; i < n; i++){
         for (int j = i+1; j < n; j++){
-            pairs.push_back(make_pair(i, j));
+            if (d[i][j] == 999999999){
+                cout << "INF" << endl;
+                break;
+            }
+            else if (d[i][j] > max){
+                max = d[i][j];
+            }
         }
     }
 
-    for (int i = 0; i < (int)pairs.size(); i++){
-        g.distance.clear();
-        g.shortestPath(pairs[i].first);
-
-        if (g.distance[pairs[i].second] == -1){
-            cout << "INF" << endl;
-            break;
-        }
-        else if (g.distance[pairs[i].second] > max){
-            max = g.distance[pairs[i].second];
-        }
-    }
     cout << max << endl;
     return;
 }
